@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Set your GLPI server URL here (without trailing slash)
+GLPI_SERVER_URL="http://your-glpi-server/glpi"
+
+# Step 1: Update system
+echo "🔄 Updating system..."
+sudo apt update && sudo apt upgrade -y
+
+# Step 2: Download latest GLPI agent (adjust version if needed)
+echo "📦 Downloading GLPI Agent..."
+cd /tmp
+wget -O glpi-agent.deb https://github.com/glpi-project/glpi-agent/releases/download/1.8/glpi-agent_1.8-1_all.deb
+
+# Step 3: Install agent
+echo "⚙️ Installing GLPI Agent..."
+sudo dpkg -i glpi-agent.deb
+
+# Step 4: Fix dependencies if required
+echo "🔧 Fixing missing dependencies (if any)..."
+sudo apt --fix-broken install -y
+
+# Step 5: Configure GLPI Server
+echo "📝 Configuring agent to point to GLPI server..."
+sudo mkdir -p /etc/glpi-agent/conf.d
+echo -e "[server]\nurl = $GLPI_SERVER_URL" | sudo tee /etc/glpi-agent/conf.d/00-server.conf
+
+# Step 6: Enable and restart service
+echo "🚀 Starting and enabling GLPI Agent service..."
+sudo systemctl daemon-reexec
+sudo systemctl enable glpi-agent
+sudo systemctl restart glpi-agent
+
+# Step 7: Run inventory immediately
+echo "🧾 Running inventory scan now..."
+sudo glpi-agent
+
+echo "✅ GLPI Agent installation and setup complete!"
