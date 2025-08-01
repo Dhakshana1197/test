@@ -36,3 +36,9 @@ echo "🧾 Running inventory scan now..."
 sudo glpi-agent
 
 echo "✅ GLPI Agent installation and setup complete!"
+
+
+#!/bin/bash
+sudo systemctl stop openvpn@VYB-TN038
+
+sudo systemctl status openvpn@VYB-TN038
